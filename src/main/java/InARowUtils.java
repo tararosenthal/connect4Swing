@@ -83,34 +83,6 @@ public class InARowUtils<T> {
         return new int[][]{new int[]{-1, -1}};
     }
 
-    public int[][] findAnyDiagonal(int numInARow) {
-        for (int row = 0; row < numOfRows; row++) {
-            int[][] winningCoordinates = findForwardSlash(numInARow, row, 0);
-            if (winningCoordinates[0][0] != -1) {
-                return winningCoordinates;
-            }
-        }
-        for (int column = 0; column < numOfColumns; column++) {
-            int[][] winningCoordinates = findForwardSlash(numInARow, 0, column);
-                if (winningCoordinates[0][0] != -1) {
-                    return winningCoordinates;
-                }
-        }
-        for (int column = 0; column < numOfColumns; column++) {
-            int[][] winningCoordinates = findBackSlash(numInARow, numOfRows - 1, column);
-                if (winningCoordinates[0][0] != -1) {
-                    return winningCoordinates;
-                }
-        }
-        for (int row = 0; row < numOfRows; row++) {
-            int[][] winningCoordinates = findBackSlash(numInARow, row, numOfColumns - 1);
-                if (winningCoordinates[0][0] != -1) {
-                    return winningCoordinates;
-                }
-        }
-        return new int[][]{new int[]{-1, -1}};
-    }
-
     public int[][] findForwardSlash(int numInARow, int row, int column) {
         int leftLimit = Math.min(numOfRows - 1 - row, column);
         int rightLimit = Math.min(row, numOfColumns - 1 - column);
@@ -161,4 +133,71 @@ public class InARowUtils<T> {
         return new int[][]{new int[]{-1, -1}};
     }
 
+    public int[][] findAnyHorizontal(int numInARow) {
+        for (int row = 0; row < numOfRows; row++) {
+            int winningCoordinatesCount = 0;
+            int[][] winningCoordinates = new int[numInARow][2];
+            for (int column = 0; column < numOfColumns; column++) {
+                if (Objects.equals(array[row][column], element)) {
+                    winningCoordinates[winningCoordinatesCount] = new int[]{row, column};
+                    winningCoordinatesCount++;
+                    if (winningCoordinatesCount >= numInARow) {
+                        return winningCoordinates;
+                    }
+                } else {
+                    winningCoordinatesCount = 0;
+                    winningCoordinates = new int[numInARow][2];
+                }
+            }
+        }
+        return new int[][]{new int[]{-1, -1}};
+    }
+
+    public int[][] findAnyVertical(int numInARow) {
+        for (int column = 0; column < numOfColumns; column++) {
+            int winningCoordinatesCount = 0;
+            int[][] winningCoordinates = new int[numInARow][2];
+            for (int row = 0; row < numOfRows; row++) {
+                if (Objects.equals(array[row][column], element)) {
+                    winningCoordinates[winningCoordinatesCount] = new int[]{row, column};
+                    winningCoordinatesCount++;
+                    if (winningCoordinatesCount >= numInARow) {
+                        return winningCoordinates;
+                    }
+                } else {
+                    winningCoordinatesCount = 0;
+                    winningCoordinates = new int[numInARow][2];
+                }
+            }
+        }
+        return new int[][]{new int[]{-1, -1}};
+    }
+
+    public int[][] findAnyDiagonal(int numInARow) {
+        for (int row = 0; row < numOfRows; row++) {
+            int[][] winningCoordinates = findForwardSlash(numInARow, row, 0);
+            if (winningCoordinates[0][0] != -1) {
+                return winningCoordinates;
+            }
+        }
+        for (int column = 0; column < numOfColumns; column++) {
+            int[][] winningCoordinates = findForwardSlash(numInARow, 0, column);
+            if (winningCoordinates[0][0] != -1) {
+                return winningCoordinates;
+            }
+        }
+        for (int column = 0; column < numOfColumns; column++) {
+            int[][] winningCoordinates = findBackSlash(numInARow, numOfRows - 1, column);
+            if (winningCoordinates[0][0] != -1) {
+                return winningCoordinates;
+            }
+        }
+        for (int row = 0; row < numOfRows; row++) {
+            int[][] winningCoordinates = findBackSlash(numInARow, row, numOfColumns - 1);
+            if (winningCoordinates[0][0] != -1) {
+                return winningCoordinates;
+            }
+        }
+        return new int[][]{new int[]{-1, -1}};
+    }
 }
