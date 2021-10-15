@@ -72,8 +72,11 @@ public class Board extends JPanel {
 
     void checkBoardStatus(Cell updatedCell) {
         int index = cells.indexOf(updatedCell);
+        int row = index / numOfColumns;
+        int column = index % numOfColumns;
         boolean isBoardFull = true;
-        cellValuesArray[index / numOfColumns][index % numOfColumns] = updatedCell.getText();
+
+        cellValuesArray[row][column] = updatedCell.getText();
 
         for (String[] array: cellValuesArray) {
             for (String s: array) {
@@ -83,24 +86,24 @@ public class Board extends JPanel {
             }
         }
 
-        setBoardStatus(isBoardFull);
+        setBoardStatus(isBoardFull, row, column);
     }
 
-    private void setBoardStatus(boolean isBoardFull) {
+    private void setBoardStatus(boolean isBoardFull, int row, int column) {
         statusBar.setStatus(
-                checkIfWin("X") ?
+                checkIfWin("X", row, column) ?
                         BoardStatus.X_WINS :
-                        checkIfWin("O") ?
+                        checkIfWin("O", row, column) ?
                                 BoardStatus.O_WINS :
                                 isBoardFull ?
                                         BoardStatus.DRAW :
                                         BoardStatus.GAME_IN_PROGRESS);
     }
 
-    private boolean checkIfWin(String element) {
+    private boolean checkIfWin(String element, int row, int column) {
         InARowUtils<String> inARowUtils = new InARowUtils<>(cellValuesArray, element);
         int numInARow = 4;
-        List<int[][]> allWinningCoordinates = inARowUtils.findAnyDirection(numInARow);
+        List<int[][]> allWinningCoordinates = inARowUtils.findAllDirections(numInARow, row, column);
 
         if (!allWinningCoordinates.isEmpty()) {
             gameOver = true;
