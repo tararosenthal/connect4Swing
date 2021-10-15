@@ -52,15 +52,16 @@ public class Board extends JPanel {
         }
     }
 
-    String getElementIfValidMoveOrElseBlank(Cell cell) {
-        int column = cells.indexOf(cell) % numOfColumns;
-        int row = cells.indexOf(cell) / numOfColumns;
-        if (row == numOfRows - 1) {
-            return getPlayerTurn();
-        } else if (!cellValuesArray[row + 1][column].isBlank()) {
-            return getPlayerTurn();
+    void setElementInCorrectLocationIfValidMove(Cell clickedCell) {
+        int column = cells.indexOf(clickedCell) % numOfColumns;
+        for (int row = numOfRows - 1; row >= 0; row--) {
+            Cell cellToUpdate = cells.get(row * numOfColumns + column);
+            if(cellToUpdate.getText().isBlank()) {
+                cellToUpdate.setText(getPlayerTurn());
+                checkBoardStatus(cellToUpdate);
+                break;
+            }
         }
-        return " ";
     }
 
     private String getPlayerTurn() {
@@ -69,10 +70,10 @@ public class Board extends JPanel {
         return temp;
     }
 
-    void checkStatus(Cell cell) {
-        int index = cells.indexOf(cell);
+    void checkBoardStatus(Cell updatedCell) {
+        int index = cells.indexOf(updatedCell);
         boolean isBoardFull = true;
-        cellValuesArray[index / numOfColumns][index % numOfColumns] = cell.getText();
+        cellValuesArray[index / numOfColumns][index % numOfColumns] = updatedCell.getText();
 
         for (String[] array: cellValuesArray) {
             for (String s: array) {
@@ -82,10 +83,10 @@ public class Board extends JPanel {
             }
         }
 
-        setStatus(isBoardFull);
+        setBoardStatus(isBoardFull);
     }
 
-    private void setStatus(boolean isBoardFull) {
+    private void setBoardStatus(boolean isBoardFull) {
         statusBar.setStatus(
                 checkIfWin("X") ?
                         BoardStatus.X_WINS :
@@ -98,13 +99,27 @@ public class Board extends JPanel {
 
     private boolean checkIfWin(String element) {
         InARowUtils<String> inARowUtils = new InARowUtils<>(cellValuesArray, element);
-
         int numInARow = 4;
-        gameOver = inARowUtils.checkHorizontal(numInARow)
-                || inARowUtils.checkVertical(numInARow)
-                || inARowUtils.checkDiagonal(numInARow);
+        List<int[][]> allWinningCoordinates = inARowUtils.findAnyDirection(numInARow);
+
+        if (!allWinningCoordinates.isEmpty()) {
+            gameOver = true;
+            highlightWinningMove(allWinningCoordinates);
+        }
 
         return gameOver;
+    }
+
+    private void highlightWinningMove(List<int[][]> allWinningCoordinates) {
+        List<Cell> winningCells = new ArrayList<>();
+
+        for (int[][] oneSetWinningCoordinates: allWinningCoordinates) {
+            for (int[] oneCellCoordinates: oneSetWinningCoordinates) {
+                winningCells.add(cells.get(numOfColumns * oneCellCoordinates[0] + oneCellCoordinates[1]));
+            }
+        }
+
+        winningCells.forEach(cell -> cell.setBackground(Color.CYAN));
     }
 
     public boolean isGameOver() {

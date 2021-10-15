@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class InARowUtils<T> {
@@ -19,106 +21,145 @@ public class InARowUtils<T> {
         }
     }
 
-    public boolean checkHorizontal(int numInARow) {
+    public List<int[][]> findAnyDirection(int numInARow) {
+        List<int[][]> allWinningCoordinates = new ArrayList<>();
+
+        int[][] winningCoordinates = findHorizontal(numInARow);
+        if (winningCoordinates[0][0] != -1) {
+            allWinningCoordinates.add(winningCoordinates);
+        }
+
+        winningCoordinates = findVertical(numInARow);
+        if (winningCoordinates[0][0] != -1) {
+            allWinningCoordinates.add(winningCoordinates);
+        }
+
+        winningCoordinates = findDiagonal(numInARow);
+        if (winningCoordinates[0][0] != -1) {
+            allWinningCoordinates.add(winningCoordinates);
+        }
+
+        return allWinningCoordinates;
+    }
+
+    public int[][] findHorizontal(int numInARow) {
         for (int row = 0; row < numOfRows; row++) {
-            int elementCount = 0;
+            int winningCoordinatesCount = 0;
+            int[][] winningCoordinates = new int[numInARow][2];
             for (int column = 0; column < numOfColumns; column++) {
                 if (Objects.equals(array[row][column], element)) {
-                    elementCount++;
-                    if (elementCount >= numInARow) {
-                        return true;
+                    winningCoordinates[winningCoordinatesCount] = new int[]{row, column};
+                    winningCoordinatesCount++;
+                    if (winningCoordinatesCount >= numInARow) {
+                        return winningCoordinates;
                     }
                 } else {
-                    elementCount = 0;
+                    winningCoordinatesCount = 0;
+                    winningCoordinates = new int[numInARow][2];
                 }
             }
         }
-        return false;
+        return new int[][]{new int[]{-1, -1}};
     }
 
-    public boolean checkVertical(int numInARow) {
+    public int[][] findVertical(int numInARow) {
         for (int column = 0; column < numOfColumns; column++) {
-            int elementCount = 0;
+            int winningCoordinatesCount = 0;
+            int[][] winningCoordinates = new int[numInARow][2];
             for (int row = 0; row < numOfRows; row++) {
                 if (Objects.equals(array[row][column], element)) {
-                    elementCount++;
-                    if (elementCount >= numInARow) {
-                        return true;
+                    winningCoordinates[winningCoordinatesCount] = new int[]{row, column};
+                    winningCoordinatesCount++;
+                    if (winningCoordinatesCount >= numInARow) {
+                        return winningCoordinates;
                     }
                 } else {
-                    elementCount = 0;
+                    winningCoordinatesCount = 0;
+                    winningCoordinates = new int[numInARow][2];
                 }
             }
         }
-        return false;
+        return new int[][]{new int[]{-1, -1}};
     }
 
-    public boolean checkDiagonal(int numInARow) {
+    public int[][] findDiagonal(int numInARow) {
         for (int row = 0; row < numOfRows; row++) {
-            if (checkForwardSlash(numInARow, row, 0)) {
-                return true;
+            int[][] winningCoordinates = findForwardSlash(numInARow, row, 0);
+            if (winningCoordinates[0][0] != -1) {
+                return winningCoordinates;
             }
         }
         for (int column = 0; column < numOfColumns; column++) {
-            if (checkForwardSlash(numInARow, 0, column)) {
-                return true;
-            }
+            int[][] winningCoordinates = findForwardSlash(numInARow, 0, column);
+                if (winningCoordinates[0][0] != -1) {
+                    return winningCoordinates;
+                }
         }
         for (int column = 0; column < numOfColumns; column++) {
-            if (checkBackSlash(numInARow, numOfRows - 1, column)) {
-                return true;
-            }
+            int[][] winningCoordinates = findBackSlash(numInARow, numOfRows - 1, column);
+                if (winningCoordinates[0][0] != -1) {
+                    return winningCoordinates;
+                }
         }
         for (int row = 0; row < numOfRows; row++) {
-            if (checkBackSlash(numInARow, row, numOfColumns - 1)) {
-                return true;
-            }
+            int[][] winningCoordinates = findBackSlash(numInARow, row, numOfColumns - 1);
+                if (winningCoordinates[0][0] != -1) {
+                    return winningCoordinates;
+                }
         }
-        return false;
+        return new int[][]{new int[]{-1, -1}};
     }
 
-    private boolean checkForwardSlash(int numInARow, int row,
+    private int[][] findForwardSlash(int numInARow, int row,
                                       int column) {
         int leftLimit = Math.min(numOfRows - 1 - row, column);
         int rightLimit = Math.min(row, numOfColumns - 1 - column);
         int maxShift = leftLimit + rightLimit + 1;
+
         row += leftLimit;
         column -= leftLimit;
-        int pieceCount = 0;
+        int winningCoordinatesCount = 0;
+        int[][] winningCoordinates = new int[numInARow][2];
 
         for (int i = 0; i < maxShift; i++) {
             if (Objects.equals(array[row - i][column + i], element)) {
-                pieceCount++;
-                if (pieceCount >= numInARow) {
-                    return true;
+                winningCoordinates[winningCoordinatesCount] = new int[]{row - i, column + i};
+                winningCoordinatesCount++;
+                if (winningCoordinatesCount >= numInARow) {
+                    return winningCoordinates;
                 }
             } else {
-                pieceCount = 0;
+                winningCoordinatesCount = 0;
+                winningCoordinates = new int[numInARow][2];
             }
         }
-        return false;
+        return new int[][]{new int[]{-1, -1}};
     }
 
-    private boolean checkBackSlash(int numInARow, int row,
+    private int[][] findBackSlash(int numInARow, int row,
                                    int column) {
         int plusLimit = Math.min(numOfRows - 1 - row, numOfColumns - 1 - column);
         int minusLimit = Math.min(row, column);
         int maxShift = plusLimit + minusLimit + 1;
+
         row -= minusLimit;
         column -= minusLimit;
-        int pieceCount = 0;
+        int winningCoordinatesCount = 0;
+        int[][] winningCoordinates = new int[numInARow][2];
 
         for (int i = 0; i < maxShift; i++) {
             if (Objects.equals(array[row + i][column + i], element)) {
-                pieceCount++;
-                if (pieceCount >= numInARow) {
-                    return true;
+                winningCoordinates[winningCoordinatesCount] = new int[]{row + i, column + i};
+                winningCoordinatesCount++;
+                if (winningCoordinatesCount >= numInARow) {
+                    return winningCoordinates;
                 }
             } else {
-                pieceCount = 0;
+                winningCoordinatesCount = 0;
+                winningCoordinates = new int[numInARow][2];
             }
         }
-        return false;
+        return new int[][]{new int[]{-1, -1}};
     }
 
 }
